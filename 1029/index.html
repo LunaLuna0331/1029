@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>西方藝術史向量時間軸 | Scrollytelling 沉浸式互動微動效</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            slate: {
+              950: '#020617',
+              900: '#0b1120',
+              850: '#111827',
+              800: '#1e293b',
+            },
+            phase1: {
+              glow: '#fbbf24',
+              accent: '#f59e0b',
+              badge: '#78350f',
+            },
+            phase2: {
+              glow: '#fb7185',
+              accent: '#f43f5e',
+              badge: '#881337',
+            },
+            phase3: {
+              glow: '#38bdf8',
+              accent: '#06b6d4',
+              badge: '#164e63',
+            },
+            phase4: {
+              glow: '#c084fc',
+              accent: '#8b5cf6',
+              badge: '#581c87',
+            }
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Cinzel', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet">
+
+  <!-- GSAP 3 & Plugins (ScrollTrigger, ScrollToPlugin) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #020617;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
+
+    /* Subtle Animated Grid Background */
+    .bg-cyber-grid {
+      background-size: 50px 50px;
+      background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    }
+
+    /* Glassmorphism Surface */
+    .glass-panel {
+      background: rgba(11, 17, 32, 0.82);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .glass-card {
+      background: radial-gradient(120% 120% at 50% 0%, rgba(30, 41, 59, 0.45) 0%, rgba(15, 23, 42, 0.85) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* SVG Timeline Track animations */
+    .svg-node-pulse {
+      animation: pulseRings 2.8s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+    }
+
+    @keyframes pulseRings {
+      0% {
+        r: 10px;
+        opacity: 0.8;
+      }
+
+      50% {
+        opacity: 0.25;
+      }
+
+      100% {
+        r: 32px;
+        opacity: 0;
+      }
+    }
+
+    /* Text gradient clip */
+    .text-gradient-gold {
+      background: linear-gradient(135deg, #fef08a 0%, #f59e0b 60%, #b45309 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .text-gradient-rose {
+      background: linear-gradient(135deg, #ffe4e6 0%, #f43f5e 60%, #be123c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .text-gradient-cyan {
+      background: linear-gradient(135deg, #cffafe 0%, #06b6d4 60%, #0e7490 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .text-gradient-purple {
+      background: linear-gradient(135deg, #f3e8ff 0%, #a855f7 60%, #6b21a8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Floating ambient light orbs */
+    .ambient-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Custom smooth card transition styling */
+    .phase-card {
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform;
+    }
+  </style>
+</head>
+
+<body
+  class="bg-slate-950 text-slate-100 font-sans selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden relative min-h-screen">
+
+  <!-- ==========================================
+       TOP FIXED PROGRESS BAR & STATUS HUD
+  =========================================== -->
+  <header class="fixed top-0 left-0 w-full z-50 pointer-events-none">
+    <!-- Real-time dynamic progress line -->
+    <div class="w-full h-[3px] bg-slate-900/80 backdrop-blur">
+      <div id="top-progress-fill"
+        class="h-full w-0 bg-gradient-to-r from-amber-400 via-rose-500 via-cyan-400 to-purple-500 shadow-[0_0_12px_rgba(56,189,248,0.8)] transition-[width] duration-75">
+      </div>
+    </div>
+
+    <!-- Floating Top Bar Glass Badge -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between pointer-events-auto">
+      <div class="flex items-center gap-3">
+        <a href="#hero"
+          class="group flex items-center gap-2.5 px-3.5 py-1.5 rounded-full glass-panel hover:border-cyan-500/40 transition-all duration-300 shadow-lg">
+          <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+          <span class="font-serif tracking-wider text-xs uppercase font-bold text-slate-200 group-hover:text-white">Art
+            History Chronos</span>
+          <span
+            class="text-[10px] font-mono text-cyan-400/90 px-1.5 py-0.5 rounded bg-cyan-950/70 border border-cyan-800/40">VECTOR
+            TIMELINE</span>
+        </a>
+      </div>
+
+      <!-- Live Epoch Status Badge -->
+      <div
+        class="hidden md:flex items-center gap-3 glass-panel px-4 py-1.5 rounded-full border border-white/10 shadow-lg">
+        <span class="text-xs font-mono text-slate-400">EPOCH:</span>
+        <span id="current-epoch-label"
+          class="text-xs font-mono font-semibold text-amber-400 transition-colors duration-300">Phase 01 //
+          古典希臘與羅馬</span>
+        <span class="w-1 h-1 rounded-full bg-slate-600"></span>
+        <span id="progress-percentage-label" class="text-xs font-mono text-cyan-400 font-bold">00% EXPLORED</span>
+      </div>
+
+      <!-- Controls: Audio Synthesizer Toggle & Quick Jump to Stats -->
+      <div class="flex items-center gap-2">
+        <button id="sound-toggle-btn"
+          class="glass-panel hover:bg-slate-800/80 p-2 rounded-full border border-white/10 text-slate-300 hover:text-cyan-300 transition-all text-xs flex items-center gap-1.5 px-3 shadow-md"
+          title="切換環境音效體驗 (Web Audio API)">
+          <svg id="sound-icon-on" class="w-4 h-4 hidden text-cyan-400" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z">
+            </path>
+          </svg>
+          <svg id="sound-icon-off" class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z">
+            </path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path>
+          </svg>
+          <span id="sound-status-text" class="font-mono text-[11px] text-slate-400">AUDIO OFF</span>
+        </button>
+
+        <a href="#stats-section"
+          class="glass-panel hover:bg-slate-800/80 px-3 py-1.5 rounded-full border border-white/10 text-xs font-mono text-slate-300 hover:text-white transition-all flex items-center gap-1 shadow-md">
+          <span>數據結論</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       BOTTOM HUD FLOATING PHASE DOCK
+  =========================================== -->
+  <aside class="fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
+    <nav
+      class="glass-panel px-2.5 py-2 rounded-full shadow-[0_12px_40px_rgba(0,0,0,0.7)] flex items-center gap-1 sm:gap-2 border border-white/10"
+      aria-label="階段快速導覽 HUD">
+      <button
+        class="hud-nav-btn active flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 text-amber-300 bg-amber-500/15 border border-amber-500/40 shadow-md"
+        data-phase-index="0" title="Phase 01: 古典希臘與羅馬">
+        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+        <span class="hidden sm:inline">01</span><span>古典</span>
+      </button>
+      <button
+        class="hud-nav-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 text-slate-400 hover:text-rose-300 hover:bg-rose-500/10 border border-transparent"
+        data-phase-index="1" title="Phase 02: 義大利文藝復興">
+        <span class="w-2 h-2 rounded-full bg-slate-600"></span>
+        <span class="hidden sm:inline">02</span><span>文藝復興</span>
+      </button>
+      <button
+        class="hud-nav-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 text-slate-400 hover:text-cyan-300 hover:bg-cyan-500/10 border border-transparent"
+        data-phase-index="2" title="Phase 03: 印象派光影革命">
+        <span class="w-2 h-2 rounded-full bg-slate-600"></span>
+        <span class="hidden sm:inline">03</span><span>印象派</span>
+      </button>
+      <button
+        class="hud-nav-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 text-slate-400 hover:text-purple-300 hover:bg-purple-500/10 border border-transparent"
+        data-phase-index="3" title="Phase 04: 現代主義前衛">
+        <span class="w-2 h-2 rounded-full bg-slate-600"></span>
+        <span class="hidden sm:inline">04</span><span>現代</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- ==========================================
+       SECTION 1: HERO INTRODUCTION
+  =========================================== -->
+  <section id="hero"
+    class="relative min-h-screen flex items-center justify-center px-4 sm:px-6 pt-24 pb-16 bg-cyber-grid overflow-hidden">
+    <!-- Ambient Backdrop Gradients -->
+    <div class="ambient-orb w-96 h-96 bg-cyan-600/20 top-1/4 left-1/4 -translate-x-1/2"></div>
+    <div class="ambient-orb w-[450px] h-[450px] bg-purple-600/15 top-1/3 right-1/4 translate-x-1/2"></div>
+    <div class="ambient-orb w-80 h-80 bg-amber-500/10 bottom-10 left-1/2 -translate-x-1/2"></div>
+
+    <div class="relative z-10 max-w-5xl mx-auto text-center">
+      <!-- Tag / Badge -->
+      <div
+        class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel border border-cyan-500/30 text-cyan-300 text-xs font-mono tracking-widest uppercase mb-8 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
+        <span class="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+        GSAP 3 物理阻尼驅動 • 向量導軌時間軸
+      </div>
+
+      <!-- Main Title -->
+      <h1 class="text-4xl sm:text-6xl md:text-7xl font-serif font-bold tracking-tight text-white mb-6 leading-[1.15]">
+        西方藝術史的<br class="hidden sm:block">
+        <span class="text-gradient-cyan">光影</span> 與 <span class="text-gradient-gold">形體</span> 演進篇章
+      </h1>
+
+      <!-- Subtitle Description -->
+      <p class="max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-slate-300 font-light leading-relaxed mb-10">
+        從古典理性的黃金比例、文藝復興透視的秩序重建，到印象派捕捉瞬息光斑，終至現代主義的抽象解構。請隨滾輪漫遊四千年的美學躍遷。
+      </p>
+
+      <!-- Key Metas Pill Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-3xl mx-auto mb-12">
+        <div class="glass-panel p-3.5 rounded-2xl border border-white/5 text-center">
+          <div class="text-xs font-mono text-slate-400 mb-1">EPOCH SPAN</div>
+          <div class="font-serif font-bold text-amber-300 text-base">2,800+ 年</div>
+        </div>
+        <div class="glass-panel p-3.5 rounded-2xl border border-white/5 text-center">
+          <div class="text-xs font-mono text-slate-400 mb-1">PARADIGM</div>
+          <div class="font-serif font-bold text-rose-300 text-base">4 大變革</div>
+        </div>
+        <div class="glass-panel p-3.5 rounded-2xl border border-white/5 text-center">
+          <div class="text-xs font-mono text-slate-400 mb-1">ENGINE</div>
+          <div class="font-serif font-bold text-cyan-300 text-base">ScrollTrigger</div>
+        </div>
+        <div class="glass-panel p-3.5 rounded-2xl border border-white/5 text-center">
+          <div class="text-xs font-mono text-slate-400 mb-1">INTERACTION</div>
+          <div class="font-serif font-bold text-purple-300 text-base">雙向聯動導軌</div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <button id="hero-start-btn"
+          class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-slate-950 font-bold font-sans tracking-wide text-sm shadow-[0_0_25px_rgba(6,182,212,0.4)] transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-2">
+          <span>啟動時間軸巡禮</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3">
+            </path>
+          </svg>
+        </button>
+        <button id="hero-quick-guide-btn"
+          class="w-full sm:w-auto px-7 py-3.5 rounded-full glass-panel hover:bg-slate-800/60 text-slate-300 hover:text-white font-mono text-xs border border-white/10 transition-all flex items-center justify-center gap-2">
+          <span>說明規範</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+        </button>
+      </div>
+
+      <!-- Mouse Scroll Indicator -->
+      <div class="mt-16 flex flex-col items-center justify-center gap-2 text-slate-500">
+        <span class="text-[10px] font-mono tracking-widest uppercase">SCROLL TO UNVEIL VECTOR PATH</span>
+        <div class="w-5 h-8 rounded-full border-2 border-slate-600/70 p-1 flex justify-center">
+          <div class="w-1.5 h-2 bg-cyan-400 rounded-full animate-bounce"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SECTION 2: PINNED SHOWCASE VIEWPORT
+       (GSAP Pins this section with scrub: 1.0)
+  =========================================== -->
+  <section id="pinned-track-section"
+    class="relative w-full h-screen overflow-hidden flex flex-col justify-between p-4 sm:p-6 lg:p-10 bg-slate-950">
+
+    <!-- Subtle Background radial lights for active ambiance -->
+    <div id="ambient-stage-glow"
+      class="ambient-orb w-[650px] h-[650px] bg-amber-500/10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-colors duration-700">
+    </div>
+
+    <!-- Stage Header Bar inside Pinned Window -->
+    <div
+      class="relative z-10 w-full max-w-7xl mx-auto flex items-center justify-between border-b border-white/10 pb-3 sm:pb-4">
+      <div>
+        <span class="text-[11px] font-mono text-cyan-400 tracking-wider uppercase">IMMERSIVE VECTOR EXHIBIT</span>
+        <h2 class="text-lg sm:text-2xl font-serif font-bold text-white tracking-wide">審美範式演繹核心視窗</h2>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="text-right">
+          <div class="text-[10px] font-mono text-slate-400">GSAP SCRUB PHYSICS</div>
+          <div class="text-xs font-mono font-bold text-emerald-400">DAMPING: 1.0s SMOOTH</div>
+        </div>
+        <div class="hidden sm:block w-9 h-9 rounded-xl glass-panel border border-white/10 p-2 text-cyan-300 shadow-md">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Stage Split Layout: SVG Vector Rail (Left) + Phase Exhibition Theater (Right) -->
+    <div
+      class="relative z-10 w-full max-w-7xl mx-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-center py-2 sm:py-4 my-auto min-h-0">
+
+      <!-- LEFT COLUMN: The Interactive SVG Curved Vector Track (5 cols on lg) -->
+      <div
+        class="hidden md:flex lg:col-span-5 h-[340px] sm:h-[460px] lg:h-[560px] relative glass-card rounded-3xl p-4 sm:p-5 border border-white/10 flex-col justify-between overflow-hidden shadow-2xl">
+
+        <div class="flex items-center justify-between pb-2 border-b border-white/5">
+          <span class="text-xs font-mono text-slate-400 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+            VECTOR RAIL CONDUCTOR
+          </span>
+          <span id="rail-length-label" class="text-[10px] font-mono text-cyan-300/80">CALCULATING PATH...</span>
+        </div>
+
+        <!-- The SVG Container -->
+        <div class="relative flex-1 w-full flex items-center justify-center my-1">
+          <svg id="timeline-svg" class="w-full h-full max-h-[480px]" viewBox="0 0 340 760" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <!-- Dynamic Neon Rail Gradient -->
+              <linearGradient id="rail-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#f59e0b" />
+                <stop offset="35%" stop-color="#f43f5e" />
+                <stop offset="68%" stop-color="#06b6d4" />
+                <stop offset="100%" stop-color="#8b5cf6" />
+              </linearGradient>
+
+              <!-- High Intensity Neon Glow Filter -->
+              <filter id="neon-glow" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur stdDeviation="6" result="blur1" />
+                <feGaussianBlur stdDeviation="15" result="blur2" />
+                <feMerge>
+                  <feMergeNode in="blur2" />
+                  <feMergeNode in="blur1" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+
+              <!-- Node Pulse Filter -->
+              <filter id="node-glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="5" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+
+            <!-- 1. Background Static Guide Track (Subtle slate dashed path) -->
+            <path id="static-track"
+              d="M 170 30 C 170 70, 110 80, 110 130 C 110 210, 230 230, 230 310 C 230 390, 110 410, 110 490 C 110 570, 210 590, 210 670 C 210 710, 170 710, 170 740"
+              stroke="#1e293b" stroke-width="5" stroke-dasharray="6 8" stroke-linecap="round" />
+
+            <!-- 2. Active Dynamic Glowing Progress Path (Drawn via strokeDashoffset) -->
+            <path id="active-track"
+              d="M 170 30 C 170 70, 110 80, 110 130 C 110 210, 230 230, 230 310 C 230 390, 110 410, 110 490 C 110 570, 210 590, 210 670 C 210 710, 170 710, 170 740"
+              stroke="url(#rail-gradient)" stroke-width="6" stroke-linecap="round" filter="url(#neon-glow)" />
+
+            <!-- 3. Dynamic Traveling Comet Head (Glides on path's leading edge) -->
+            <g id="comet-group" transform="translate(170, 30)">
+              <circle id="comet-pulse" r="16" fill="#06b6d4" opacity="0.4" filter="url(#node-glow)"></circle>
+              <circle id="comet-head" r="7" fill="#ffffff" stroke="#38bdf8" stroke-width="3" filter="url(#node-glow)">
+              </circle>
+            </g>
+
+            <!-- 4. Milestone Nodes (Phase 01 ~ Phase 04) with two-way clickable interaction -->
+            <!-- Node 1: Classical Antiquity (Approx x=110, y=130) -->
+            <g class="svg-milestone-node group cursor-pointer transition-transform duration-300" data-phase-index="0"
+              transform="translate(110, 130)">
+              <circle class="hit-area" r="34" fill="transparent"></circle>
+              <circle class="node-ripple svg-node-pulse" r="12" fill="#f59e0b" opacity="0.35"></circle>
+              <circle class="node-base transition-all duration-300" r="14" fill="#0f172a" stroke="#f59e0b"
+                stroke-width="2.5"></circle>
+              <circle class="node-core transition-all duration-300" r="6" fill="#fbbf24" filter="url(#node-glow)">
+              </circle>
+              <text x="-24" y="4" text-anchor="end" fill="#fef08a" font-family="'JetBrains Mono', monospace"
+                font-size="11" font-weight="700">01 // 古典</text>
+            </g>
+
+            <!-- Node 2: Italian Renaissance (Approx x=230, y=310) -->
+            <g class="svg-milestone-node group cursor-pointer transition-transform duration-300" data-phase-index="1"
+              transform="translate(230, 310)">
+              <circle class="hit-area" r="34" fill="transparent"></circle>
+              <circle class="node-ripple svg-node-pulse" r="12" fill="#f43f5e" opacity="0.35"></circle>
+              <circle class="node-base transition-all duration-300" r="14" fill="#0f172a" stroke="#f43f5e"
+                stroke-width="2.5"></circle>
+              <circle class="node-core transition-all duration-300" r="6" fill="#fb7185" filter="url(#node-glow)">
+              </circle>
+              <text x="26" y="4" text-anchor="start" fill="#ffe4e6" font-family="'JetBrains Mono', monospace"
+                font-size="11" font-weight="700">02 // 文藝復興</text>
+            </g>
+
+            <!-- Node 3: Impressionism (Approx x=110, y=490) -->
+            <g class="svg-milestone-node group cursor-pointer transition-transform duration-300" data-phase-index="2"
+              transform="translate(110, 490)">
+              <circle class="hit-area" r="34" fill="transparent"></circle>
+              <circle class="node-ripple svg-node-pulse" r="12" fill="#06b6d4" opacity="0.35"></circle>
+              <circle class="node-base transition-all duration-300" r="14" fill="#0f172a" stroke="#06b6d4"
+                stroke-width="2.5"></circle>
+              <circle class="node-core transition-all duration-300" r="6" fill="#38bdf8" filter="url(#node-glow)">
+              </circle>
+              <text x="-24" y="4" text-anchor="end" fill="#cffafe" font-family="'JetBrains Mono', monospace"
+                font-size="11" font-weight="700">03 // 印象派</text>
+            </g>
+
+            <!-- Node 4: Modernism (Approx x=210, y=670) -->
+            <g class="svg-milestone-node group cursor-pointer transition-transform duration-300" data-phase-index="3"
+              transform="translate(210, 670)">
+              <circle class="hit-area" r="34" fill="transparent"></circle>
+              <circle class="node-ripple svg-node-pulse" r="12" fill="#8b5cf6" opacity="0.35"></circle>
+              <circle class="node-base transition-all duration-300" r="14" fill="#0f172a" stroke="#8b5cf6"
+                stroke-width="2.5"></circle>
+              <circle class="node-core transition-all duration-300" r="6" fill="#c084fc" filter="url(#node-glow)">
+              </circle>
+              <text x="26" y="4" text-anchor="start" fill="#f3e8ff" font-family="'JetBrains Mono', monospace"
+                font-size="11" font-weight="700">04 // 現代</text>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Bottom Micro Instructions -->
+        <div
+          class="flex items-center justify-between pt-2 border-t border-white/5 text-[11px] font-mono text-slate-400">
+          <span class="flex items-center gap-1">
+            <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122">
+              </path>
+            </svg>
+            點擊節點平滑跳轉
+          </span>
+          <span id="node-hover-hint" class="text-cyan-300">Hover 節點放大檢視</span>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: Phase Stage Exhibition Theater (7 cols on lg, full on mobile) -->
+      <div class="lg:col-span-7 relative h-[480px] sm:h-[540px] lg:h-[560px] w-full">
+
+        <!-- ==============================================
+             PHASE CARD 01: CLASSICAL ANTIQUITY (古希臘羅馬)
+        =============================================== -->
+        <article id="phase-card-0"
+          class="phase-card absolute inset-0 w-full h-full glass-card rounded-3xl p-5 sm:p-7 lg:p-9 border border-amber-500/30 flex flex-col justify-between overflow-y-auto shadow-2xl opacity-100 z-10">
+          <div>
+            <!-- Card Header Badge -->
+            <div class="flex items-center justify-between mb-3">
+              <span
+                class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/15 border border-amber-500/40 text-amber-300 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                PHASE 01 // 800 BCE – 476 CE
+              </span>
+              <span class="text-3xl sm:text-4xl font-serif font-black text-amber-500/20">01</span>
+            </div>
+
+            <!-- Main Titles -->
+            <h3 class="text-xl sm:text-2xl lg:text-3xl font-serif font-bold text-white mb-1.5 tracking-wide">
+              古典希臘與羅馬：<span class="text-gradient-gold">理想比例與理性的黎明</span>
+            </h3>
+            <p class="text-xs sm:text-sm font-mono text-amber-300/80 mb-4">
+              HARMONY, GOLDEN PROPORTION & THE RATIONAL ORDER
+            </p>
+
+            <!-- Description -->
+            <p class="text-slate-300 text-xs sm:text-sm leading-relaxed mb-4 sm:mb-5 font-light">
+              擺脫原始圖騰的恐懼，古希臘人以人體為宇宙神聖的終極度量。藉由黃金比例（$1 : 1.618$）與對立平衡（Contrapposto），將數學真理轉化為大理石上的崇高、克制與理性神采，奠定西方兩千年造形美學根基。
+            </p>
+
+            <!-- Interactive Visual Experiment: Golden Ratio Geometric Canvas -->
+            <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-amber-500/20 mb-4 sm:mb-5 shadow-inner">
+              <div class="flex items-center justify-between mb-2 text-xs font-mono text-amber-200">
+                <span class="flex items-center gap-1.5 font-bold">
+                  <span>🏛️</span> 帕德嫩神廟幾何分割與神聖螺旋
+                </span>
+                <button id="toggle-golden-grid"
+                  class="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 transition-all text-[11px]">
+                  切換幾何輔助線
+                </button>
+              </div>
+              <!-- SVG Diagram for Golden Spiral & Columns -->
+              <div
+                class="relative w-full h-28 sm:h-32 flex items-center justify-center bg-slate-950/70 rounded-xl overflow-hidden border border-white/5">
+                <svg id="golden-spiral-svg" class="w-full h-full" viewBox="0 0 500 200" fill="none">
+                  <!-- Column Silhouettes -->
+                  <rect x="60" y="40" width="24" height="120" rx="3" fill="#334155" opacity="0.6" />
+                  <rect x="120" y="40" width="24" height="120" rx="3" fill="#334155" opacity="0.6" />
+                  <rect x="180" y="40" width="24" height="120" rx="3" fill="#334155" opacity="0.6" />
+                  <rect x="240" y="40" width="24" height="120" rx="3" fill="#334155" opacity="0.6" />
+                  <path d="M 40 40 L 280 40 L 160 15 Z" fill="#475569" opacity="0.7" />
+                  <rect x="40" y="160" width="240" height="10" fill="#475569" opacity="0.7" />
+                  <!-- Golden Spiral Overlay -->
+                  <path id="spiral-path"
+                    d="M 460 160 A 120 120 0 0 0 340 40 A 74 74 0 0 0 266 114 A 46 46 0 0 0 312 160 A 28 28 0 0 0 340 132"
+                    stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" fill="none" filter="url(#node-glow)">
+                  </path>
+                  <g id="golden-guides" class="transition-opacity duration-300" opacity="0.8">
+                    <rect x="266" y="40" width="194" height="120" stroke="#fbbf24" stroke-width="1"
+                      stroke-dasharray="3 3" fill="none"></rect>
+                    <text x="350" y="185" fill="#fef08a" font-size="11" font-family="'JetBrains Mono', monospace">Φ =
+                      1.618033988...</text>
+                  </g>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Key Pillars Chips -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div class="p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
+                <div class="text-[11px] font-mono text-amber-400">01. 比例對稱</div>
+                <div class="text-xs text-slate-300 mt-0.5">神殿柱式與人體身高的數學律</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
+                <div class="text-[11px] font-mono text-amber-400">02. 對立平衡</div>
+                <div class="text-xs text-slate-300 mt-0.5">重心單腳佇立的活態雕刻</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
+                <div class="text-[11px] font-mono text-amber-400">03. 理性英雄觀</div>
+                <div class="text-xs text-slate-300 mt-0.5">將神格人體化，歌頌健美與意志</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Footer Quote -->
+          <blockquote class="mt-4 pt-3 border-t border-amber-500/20 text-xs italic text-amber-200/90 font-serif">
+            「人是萬物的尺度；真正的美，是各部分相稱並與整體構成的絕對和諧。」—— 普羅泰戈拉
+          </blockquote>
+        </article>
+
+
+        <!-- ==============================================
+             PHASE CARD 02: ITALIAN RENAISSANCE (文藝復興)
+        =============================================== -->
+        <article id="phase-card-1"
+          class="phase-card absolute inset-0 w-full h-full glass-card rounded-3xl p-5 sm:p-7 lg:p-9 border border-rose-500/30 flex flex-col justify-between overflow-y-auto shadow-2xl opacity-0 pointer-events-none z-0">
+          <div>
+            <!-- Card Header Badge -->
+            <div class="flex items-center justify-between mb-3">
+              <span
+                class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-rose-500/15 border border-rose-500/40 text-rose-300 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span>
+                PHASE 02 // 14TH – 17TH CENTURY
+              </span>
+              <span class="text-3xl sm:text-4xl font-serif font-black text-rose-500/20">02</span>
+            </div>
+
+            <!-- Main Titles -->
+            <h3 class="text-xl sm:text-2xl lg:text-3xl font-serif font-bold text-white mb-1.5 tracking-wide">
+              義大利文藝復興：<span class="text-gradient-rose">人文主義與透視重塑</span>
+            </h3>
+            <p class="text-xs sm:text-sm font-mono text-rose-300/80 mb-4">
+              HUMANISM, LINEAR PERSPECTIVE & CHIAROSCURO
+            </p>
+
+            <!-- Description -->
+            <p class="text-slate-300 text-xs sm:text-sm leading-relaxed mb-4 sm:mb-5 font-light">
+              擺脫中世紀神權的平面禁錮，達文西、米開朗基羅將科學、解剖學與單點線性透視法注入畫布。光影暈塗法（Sfumato）模糊了生硬邊界，在二維平面上雕刻出具備靈魂深度與真實空間縱深的立體世界。
+            </p>
+
+            <!-- Interactive Visual Experiment: Perspective & Vitruvian Geometry -->
+            <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-rose-500/20 mb-4 sm:mb-5 shadow-inner">
+              <div class="flex items-center justify-between mb-2 text-xs font-mono text-rose-200">
+                <span class="flex items-center gap-1.5 font-bold">
+                  <span>📐</span> 單點線性透視與消失點焦點互動
+                </span>
+                <span class="text-[11px] text-rose-400/80 font-mono">滑鼠移入感應焦距</span>
+              </div>
+              <div id="perspective-interactive-box"
+                class="relative w-full h-28 sm:h-32 bg-slate-950/70 rounded-xl overflow-hidden border border-white/5 flex items-center justify-center cursor-crosshair">
+                <svg id="perspective-svg" class="w-full h-full" viewBox="0 0 500 200" fill="none">
+                  <!-- Perspective Floor Grid lines -->
+                  <g id="persp-lines" stroke="#f43f5e" stroke-width="1.2" opacity="0.4">
+                    <line x1="250" y1="100" x2="20" y2="200"></line>
+                    <line x1="250" y1="100" x2="100" y2="200"></line>
+                    <line x1="250" y1="100" x2="180" y2="200"></line>
+                    <line x1="250" y1="100" x2="250" y2="200"></line>
+                    <line x1="250" y1="100" x2="320" y2="200"></line>
+                    <line x1="250" y1="100" x2="400" y2="200"></line>
+                    <line x1="250" y1="100" x2="480" y2="200"></line>
+                    <!-- Horizontal recession lines -->
+                    <line x1="160" y1="130" x2="340" y2="130"></line>
+                    <line x1="110" y1="155" x2="390" y2="155"></line>
+                    <line x1="50" y1="180" x2="450" y2="180"></line>
+                  </g>
+                  <!-- Vanishing Point Glowing Orb -->
+                  <circle id="vanishing-orb" cx="250" cy="100" r="6" fill="#fb7185" filter="url(#node-glow)"></circle>
+                  <circle cx="250" cy="100" r="14" stroke="#fb7185" stroke-width="1" stroke-dasharray="3 3"
+                    opacity="0.6"></circle>
+                  <!-- Vitruvian Circle & Square Sketch -->
+                  <circle cx="250" cy="100" r="46" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="4 2"
+                    opacity="0.7"></circle>
+                  <rect x="218" y="68" width="64" height="64" stroke="#ffe4e6" stroke-width="1.2" opacity="0.5"
+                    fill="none"></rect>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Key Pillars Chips -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div class="p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
+                <div class="text-[11px] font-mono text-rose-400">01. 單點透視</div>
+                <div class="text-xs text-slate-300 mt-0.5">空間深度的幾何數學精確化</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
+                <div class="text-[11px] font-mono text-rose-400">02. 暈塗明暗</div>
+                <div class="text-xs text-slate-300 mt-0.5">Sfumato 漸隱出神秘氣韻</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
+                <div class="text-[11px] font-mono text-rose-400">03. 人文實證</div>
+                <div class="text-xs text-slate-300 mt-0.5">解剖觀察超越盲信神學</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Footer Quote -->
+          <blockquote class="mt-4 pt-3 border-t border-rose-500/20 text-xs italic text-rose-200/90 font-serif">
+            「透視是繪畫的韁繩與舵柄；細緻觀察自然，方為一切真實智慧之源。」—— 李奧納多·達文西
+          </blockquote>
+        </article>
+
+
+        <!-- ==============================================
+             PHASE CARD 03: IMPRESSIONISM (印象派光影革命)
+        =============================================== -->
+        <article id="phase-card-2"
+          class="phase-card absolute inset-0 w-full h-full glass-card rounded-3xl p-5 sm:p-7 lg:p-9 border border-cyan-500/30 flex flex-col justify-between overflow-y-auto shadow-2xl opacity-0 pointer-events-none z-0">
+          <div>
+            <!-- Card Header Badge -->
+            <div class="flex items-center justify-between mb-3">
+              <span
+                class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-cyan-500/15 border border-cyan-500/40 text-cyan-300 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                PHASE 03 // LATE 19TH CENTURY
+              </span>
+              <span class="text-3xl sm:text-4xl font-serif font-black text-cyan-500/20">03</span>
+            </div>
+
+            <!-- Main Titles -->
+            <h3 class="text-xl sm:text-2xl lg:text-3xl font-serif font-bold text-white mb-1.5 tracking-wide">
+              印象派光影革命：<span class="text-gradient-cyan">捕捉剎那的光與自然律動</span>
+            </h3>
+            <p class="text-xs sm:text-sm font-mono text-cyan-300/80 mb-4">
+              PLEIN AIR, SPECTRAL VIBRATIONS & OPTICAL MIXING
+            </p>
+
+            <!-- Description -->
+            <p class="text-slate-300 text-xs sm:text-sm leading-relaxed mb-4 sm:mb-5 font-light">
+              隨著金屬管顏料發明，畫家打破學院派幽暗封閉的畫室，奔向戶外（En plein air）。莫內不再描繪「物體自體」，而是描寫「光線在千分之一秒內撞擊視網膜的顫動」。以純粹光學色斑碎筆，定格日光流逝的真實切片。
+            </p>
+
+            <!-- Interactive Visual Experiment: Claude Monet Light & Water Ripples -->
+            <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-cyan-500/20 mb-4 sm:mb-5 shadow-inner">
+              <div class="flex items-center justify-between mb-2 text-xs font-mono text-cyan-200">
+                <span class="flex items-center gap-1.5 font-bold">
+                  <span>🎨</span> 睡蓮水波光影與三段日照色溫
+                </span>
+                <div class="flex items-center gap-1">
+                  <button
+                    class="time-shift-btn px-2 py-0.5 rounded text-[10px] bg-cyan-500/30 text-cyan-200 border border-cyan-400/40"
+                    data-time="morning">晨霧</button>
+                  <button
+                    class="time-shift-btn px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400 hover:text-white"
+                    data-time="noon">正午</button>
+                  <button
+                    class="time-shift-btn px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400 hover:text-white"
+                    data-time="sunset">暮色</button>
+                </div>
+              </div>
+
+              <!-- Water & Spectrum Canvas Simulation -->
+              <div id="monet-water-canvas"
+                class="relative w-full h-28 sm:h-32 bg-gradient-to-r from-cyan-950 via-slate-900 to-teal-950 rounded-xl overflow-hidden border border-white/5 flex items-center justify-center transition-all duration-700">
+                <svg class="w-full h-full" viewBox="0 0 500 200" fill="none">
+                  <!-- Water Wave Brushstrokes -->
+                  <g id="impression-strokes" stroke-linecap="round">
+                    <path d="M 40 60 Q 90 55, 140 62 Q 190 68, 240 60" stroke="#38bdf8" stroke-width="4"
+                      opacity="0.75" />
+                    <path d="M 120 85 Q 180 80, 240 88 Q 300 95, 360 85" stroke="#2dd4bf" stroke-width="5"
+                      opacity="0.8" />
+                    <path d="M 220 115 Q 280 110, 340 120 Q 400 125, 460 115" stroke="#818cf8" stroke-width="4.5"
+                      opacity="0.7" />
+                    <path d="M 80 145 Q 160 140, 250 148 Q 340 155, 420 145" stroke="#06b6d4" stroke-width="5"
+                      opacity="0.85" />
+                    <!-- Water Lilies floating nodes -->
+                    <ellipse cx="160" cy="90" rx="22" ry="10" fill="#047857" opacity="0.8" />
+                    <circle cx="160" cy="86" r="6" fill="#f43f5e" filter="url(#node-glow)" />
+                    <ellipse cx="320" cy="130" rx="28" ry="12" fill="#065f46" opacity="0.8" />
+                    <circle cx="320" cy="125" r="7" fill="#fbbf24" filter="url(#node-glow)" />
+                  </g>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Key Pillars Chips -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div class="p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
+                <div class="text-[11px] font-mono text-cyan-400">01. 外光主義</div>
+                <div class="text-xs text-slate-300 mt-0.5">Plein air 直面大氣與自然</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
+                <div class="text-[11px] font-mono text-cyan-400">02. 視網膜混色</div>
+                <div class="text-xs text-slate-300 mt-0.5">純色斑點在人眼中光學疊加</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
+                <div class="text-[11px] font-mono text-cyan-400">03. 時間切片</div>
+                <div class="text-xs text-slate-300 mt-0.5">連作系列記錄瞬時的光感變幻</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Footer Quote -->
+          <blockquote class="mt-4 pt-3 border-t border-cyan-500/20 text-xs italic text-cyan-200/90 font-serif">
+            「我畫的不是物體本身，而是物體與我之間那層顫動的空氣與光。」—— 克勞德·莫內
+          </blockquote>
+        </article>
+
+
+        <!-- ==============================================
+             PHASE CARD 04: MODERNISM & AVANT-GARDE (現代主義)
+        =============================================== -->
+        <article id="phase-card-3"
+          class="phase-card absolute inset-0 w-full h-full glass-card rounded-3xl p-5 sm:p-7 lg:p-9 border border-purple-500/30 flex flex-col justify-between overflow-y-auto shadow-2xl opacity-0 pointer-events-none z-0">
+          <div>
+            <!-- Card Header Badge -->
+            <div class="flex items-center justify-between mb-3">
+              <span
+                class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-purple-500/15 border border-purple-500/40 text-purple-300 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span>
+                PHASE 04 // 20TH CENTURY – PRESENT
+              </span>
+              <span class="text-3xl sm:text-4xl font-serif font-black text-purple-500/20">04</span>
+            </div>
+
+            <!-- Main Titles -->
+            <h3 class="text-xl sm:text-2xl lg:text-3xl font-serif font-bold text-white mb-1.5 tracking-wide">
+              現代主義與前衛：<span class="text-gradient-purple">形式解構與主體意識覺醒</span>
+            </h3>
+            <p class="text-xs sm:text-sm font-mono text-purple-300/80 mb-4">
+              DECONSTRUCTION, CUBISM & PURE FORMAL ABSTRACTION
+            </p>
+
+            <!-- Description -->
+            <p class="text-slate-300 text-xs sm:text-sm leading-relaxed mb-4 sm:mb-5 font-light">
+              從畢卡索的立體派（多視角同時拼貼）、康丁斯基的非具象純色交響，到蒙德里安的新造形主義。藝術徹底打破了對物理實體的外在模仿，轉向人類心靈、抽象幾何與哲學觀念的絕對自由。
+            </p>
+
+            <!-- Interactive Visual Experiment: Mondrian & Cubist Interactive Poly-Mesh -->
+            <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-purple-500/20 mb-4 sm:mb-5 shadow-inner">
+              <div class="flex items-center justify-between mb-2 text-xs font-mono text-purple-200">
+                <span class="flex items-center gap-1.5 font-bold">
+                  <span>🔲</span> 立體派幾何解構與新造型幾何矩陣
+                </span>
+                <button id="deconstruct-art-btn"
+                  class="px-2.5 py-1 rounded bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/30 transition-all text-[11px]">
+                  點擊解構形體
+                </button>
+              </div>
+
+              <div
+                class="relative w-full h-28 sm:h-32 bg-slate-950/80 rounded-xl overflow-hidden border border-white/5 flex items-center justify-center">
+                <svg id="cubist-svg" class="w-full h-full" viewBox="0 0 500 200" fill="none">
+                  <!-- Dynamic Mondrian & Cubism Planes -->
+                  <rect id="cube-plane-1" x="60" y="25" width="100" height="90" fill="#ef4444" opacity="0.8"
+                    class="transition-all duration-500"></rect>
+                  <rect id="cube-plane-2" x="170" y="25" width="140" height="60" fill="#3b82f6" opacity="0.75"
+                    class="transition-all duration-500"></rect>
+                  <rect id="cube-plane-3" x="170" y="95" width="80" height="80" fill="#eab308" opacity="0.85"
+                    class="transition-all duration-500"></rect>
+                  <rect id="cube-plane-4" x="260" y="95" width="150" height="80" fill="#f8fafc" opacity="0.9"
+                    class="transition-all duration-500"></rect>
+                  <!-- Deconstruct Black Thick Grid -->
+                  <line x1="165" y1="10" x2="165" y2="190" stroke="#000000" stroke-width="6" />
+                  <line x1="50" y1="90" x2="420" y2="90" stroke="#000000" stroke-width="6" />
+                  <line x1="255" y1="90" x2="255" y2="190" stroke="#000000" stroke-width="5" />
+                  <!-- Faceted Polygon overlay (Cubism facet) -->
+                  <polygon id="cubist-facet" points="320,30 430,70 380,140 280,100" fill="#8b5cf6" opacity="0.5"
+                    stroke="#c084fc" stroke-width="2" class="transition-all duration-500" />
+                </svg>
+              </div>
+            </div>
+
+            <!-- Key Pillars Chips -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div class="p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
+                <div class="text-[11px] font-mono text-purple-400">01. 多維並置</div>
+                <div class="text-xs text-slate-300 mt-0.5">立體派打破單一視角的時空限制</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
+                <div class="text-[11px] font-mono text-purple-400">02. 純粹抽象</div>
+                <div class="text-xs text-slate-300 mt-0.5">色彩與幾何直通精神情感共鳴</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
+                <div class="text-[11px] font-mono text-purple-400">03. 觀念現成物</div>
+                <div class="text-xs text-slate-300 mt-0.5">杜象打破畫框，以思維定義藝術</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Footer Quote -->
+          <blockquote class="mt-4 pt-3 border-t border-purple-500/20 text-xs italic text-purple-200/90 font-serif">
+            「色彩是鍵盤，眼睛是琴槌，心靈則是擁有許多弦的鋼琴。」—— 瓦西里·康丁斯基
+          </blockquote>
+        </article>
+
+      </div>
+    </div>
+
+    <!-- Stage Bottom Status Bar inside Pinned Window -->
+    <div
+      class="relative z-10 w-full max-w-7xl mx-auto flex items-center justify-between pt-2 sm:pt-3 border-t border-white/10 text-xs font-mono text-slate-400">
+      <div class="flex items-center gap-2">
+        <span class="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+        <span>PINNED CANVASES ACTIVE</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <span id="scroll-pixels-indicator" class="hidden sm:inline text-slate-500">SCROLL OFFSET: 0000 PX</span>
+        <span class="text-cyan-400 font-bold">SCRUB RATIO: <span id="scrub-ratio-text">0.00</span></span>
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- ==========================================
+       SECTION 3: CONCLUSION & DATA SYNTHESIS
+  =========================================== -->
+  <section id="stats-section"
+    class="relative min-h-screen py-24 px-4 sm:px-6 lg:px-8 bg-slate-950 bg-cyber-grid overflow-hidden border-t border-white/10">
+    <!-- Ambient Backdrop Flares -->
+    <div class="ambient-orb w-[500px] h-[500px] bg-purple-600/10 top-20 right-10"></div>
+    <div class="ambient-orb w-[400px] h-[400px] bg-cyan-600/10 bottom-20 left-10"></div>
+
+    <div class="relative z-10 max-w-6xl mx-auto">
+      <!-- Section Header -->
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <div
+          class="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-panel border border-purple-500/30 text-purple-300 text-xs font-mono uppercase mb-4">
+          <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+          EPOCH SUMMARY & PARADIGM SHIFT
+        </div>
+        <h2 class="text-3xl sm:text-5xl font-serif font-bold text-white mb-6 tracking-wide">
+          四次審美大範式：<span class="text-gradient-purple">形式與精神的昇華</span>
+        </h2>
+        <p class="text-slate-300 text-base sm:text-lg font-light leading-relaxed">
+          從古希臘對客觀秩序的理性崇拜，到現代主義將藝術權力完全回歸人類主體意識。這不僅是一部造形歷史，更是一場人類心智對現實本質的持續追問。
+        </p>
+      </div>
+
+      <!-- 4 High Impact Monumental Data Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <div
+          class="glass-card p-6 rounded-3xl border border-amber-500/20 text-center relative overflow-hidden group hover:border-amber-500/40 transition-all duration-300">
+          <div class="text-amber-400/20 font-serif font-black text-6xl absolute -bottom-4 -right-2">2.8K</div>
+          <div class="text-xs font-mono text-amber-400 mb-2">CIVILIZATION SPAN</div>
+          <div class="text-4xl font-serif font-bold text-white mb-2">2,800+ <span
+              class="text-lg font-normal text-slate-400">年</span></div>
+          <p class="text-xs text-slate-400 font-light">自荷馬史詩時代至當代後現代主義，跨越千年的文化累積</p>
+        </div>
+
+        <div
+          class="glass-card p-6 rounded-3xl border border-rose-500/20 text-center relative overflow-hidden group hover:border-rose-500/40 transition-all duration-300">
+          <div class="text-rose-400/20 font-serif font-black text-6xl absolute -bottom-4 -right-2">04</div>
+          <div class="text-xs font-mono text-rose-400 mb-2">PARADIGM SHIFTS</div>
+          <div class="text-4xl font-serif font-bold text-white mb-2">4 大 <span
+              class="text-lg font-normal text-slate-400">範式躍遷</span></div>
+          <p class="text-xs text-slate-400 font-light">古典比例 → 文藝復興透視 → 印象派光學 → 現代抽象解構</p>
+        </div>
+
+        <div
+          class="glass-card p-6 rounded-3xl border border-cyan-500/20 text-center relative overflow-hidden group hover:border-cyan-500/40 transition-all duration-300">
+          <div class="text-cyan-400/20 font-serif font-black text-6xl absolute -bottom-4 -right-2">Φ</div>
+          <div class="text-xs font-mono text-cyan-400 mb-2">GOLDEN PROPORTION</div>
+          <div class="text-4xl font-serif font-bold text-white mb-2">1.618 <span
+              class="text-lg font-normal text-slate-400">常數</span></div>
+          <p class="text-xs text-slate-400 font-light">貫穿建築、人體雕刻與畫布構圖的神聖幾何密碼</p>
+        </div>
+
+        <div
+          class="glass-card p-6 rounded-3xl border border-purple-500/20 text-center relative overflow-hidden group hover:border-purple-500/40 transition-all duration-300">
+          <div class="text-purple-400/20 font-serif font-black text-6xl absolute -bottom-4 -right-2">∞</div>
+          <div class="text-xs font-mono text-purple-400 mb-2">CREATIVE FREEDOM</div>
+          <div class="text-4xl font-serif font-bold text-white mb-2">100% <span
+              class="text-lg font-normal text-slate-400">觀念覺醒</span></div>
+          <p class="text-xs text-slate-400 font-light">藝術徹底擺脫物質界限，以純粹思想、維度與概念立足</p>
+        </div>
+      </div>
+
+      <!-- Comparative Paradigm Matrix Table -->
+      <div class="glass-card rounded-3xl p-6 sm:p-8 border border-white/10 mb-16 overflow-x-auto shadow-2xl">
+        <h3 class="text-lg font-serif font-bold text-white mb-6 flex items-center gap-2">
+          <span>📜</span>
+          西方四大美學時代核心維度比對矩陣
+        </h3>
+        <table class="w-full text-left text-xs sm:text-sm font-sans min-w-[640px]">
+          <thead>
+            <tr class="border-b border-white/10 text-slate-400 font-mono text-xs">
+              <th class="py-3 px-4">階段名稱</th>
+              <th class="py-3 px-4">核心美學哲思</th>
+              <th class="py-3 px-4">空間與光影觀念</th>
+              <th class="py-3 px-4">代表大師與作品</th>
+              <th class="py-3 px-4">劃時代突破</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5">
+            <tr class="hover:bg-white/[0.02] transition-colors">
+              <td class="py-4 px-4 font-mono font-bold text-amber-300">01. 古典希臘羅馬</td>
+              <td class="py-4 px-4 text-slate-300">和諧比例、神性人體、理性節制</td>
+              <td class="py-4 px-4 text-slate-400">對稱立體雕塑、黃金分割建築</td>
+              <td class="py-4 px-4 text-slate-300">波利克里托斯《持矛者》、帕德嫩</td>
+              <td class="py-4 px-4 text-amber-400/90 font-mono">確立西方造型比例法典</td>
+            </tr>
+            <tr class="hover:bg-white/[0.02] transition-colors">
+              <td class="py-4 px-4 font-mono font-bold text-rose-300">02. 義大利文藝復興</td>
+              <td class="py-4 px-4 text-slate-300">人文主義、打破神權桎梏、科學實證</td>
+              <td class="py-4 px-4 text-slate-400">單點線性透視、明暗對照暈塗法</td>
+              <td class="py-4 px-4 text-slate-300">達文西《蒙娜麗莎》、米開朗基羅</td>
+              <td class="py-4 px-4 text-rose-400/90 font-mono">三維縱深科學性再現</td>
+            </tr>
+            <tr class="hover:bg-white/[0.02] transition-colors">
+              <td class="py-4 px-4 font-mono font-bold text-cyan-300">03. 印象派光影革命</td>
+              <td class="py-4 px-4 text-slate-300">外光寫生、瞬間性、感官直覺刺激</td>
+              <td class="py-4 px-4 text-slate-400">光線色彩光學混合、碎筆筆觸</td>
+              <td class="py-4 px-4 text-slate-300">莫內《日出·印象》、雷諾瓦</td>
+              <td class="py-4 px-4 text-cyan-400/90 font-mono">擺脫畫室，解構真實光譜</td>
+            </tr>
+            <tr class="hover:bg-white/[0.02] transition-colors">
+              <td class="py-4 px-4 font-mono font-bold text-purple-300">04. 現代主義與前衛</td>
+              <td class="py-4 px-4 text-slate-300">主體意識覺醒、打破模仿、精神純粹</td>
+              <td class="py-4 px-4 text-slate-400">多視角拼貼、非具象純色幾何</td>
+              <td class="py-4 px-4 text-slate-300">畢卡索、康丁斯基、蒙德里安</td>
+              <td class="py-4 px-4 text-purple-400/90 font-mono">形式徹底解構，走向觀念</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Epilogue Action Card -->
+      <div class="glass-card rounded-3xl p-8 sm:p-12 border border-cyan-500/20 text-center relative overflow-hidden">
+        <h3 class="text-2xl sm:text-3xl font-serif font-bold text-white mb-4">
+          「藝術不是對物理實相的被動複製，而是人類精神的自由創造。」
+        </h3>
+        <p class="max-w-2xl mx-auto text-slate-300 font-light text-sm sm:text-base mb-8">
+          本網頁由 GSAP 3 物理阻尼（Scrub: 1.0）、ScrollTrigger 向量軌跡計算與 Tailwind CSS 構建。
+        </p>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <button id="replay-voyage-btn"
+            class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-slate-950 font-bold font-sans text-sm shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+              </path>
+            </svg>
+            <span>返回頂部重新探索</span>
+          </button>
+          <button id="revisit-timeline-btn"
+            class="w-full sm:w-auto px-6 py-3.5 rounded-full glass-panel hover:bg-slate-800 text-slate-200 text-sm font-mono border border-white/10 transition-all flex items-center justify-center gap-2">
+            <span>回到時間軸導軌</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Footer Info -->
+      <footer
+        class="mt-20 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-slate-500 gap-4">
+        <div>
+          <span>WESTERN ART HISTORY SCROLLYTELLING // SINGLE FILE PRODUCTION</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="hover:text-cyan-400 transition-colors">GSAP 3.12.5</span>
+          <span>•</span>
+          <span class="hover:text-cyan-400 transition-colors">Tailwind CSS CDN</span>
+          <span>•</span>
+          <span class="hover:text-cyan-400 transition-colors">Vanilla JS SVG Engine</span>
+        </div>
+      </footer>
+    </div>
+  </section>
+
+
+  <!-- ==========================================
+       SOUND DESIGN (Web Audio API Synthesizer)
+       Zero external audio files required!
+  =========================================== -->
+  <script>
+    class AmbientSoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.enabled = false;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      toggle() {
+        this.init();
+        this.enabled = !this.enabled;
+        if (this.enabled) {
+          this.playChime(523.25, 0.35); // C5 welcome chord
+          setTimeout(() => this.playChime(659.25, 0.35), 110);
+          setTimeout(() => this.playChime(783.99, 0.45), 220);
+        }
+        return this.enabled;
+      }
+
+      playChime(freq = 440, duration = 0.5, type = 'sine') {
+        if (!this.enabled || !this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+
+          gain.gain.setValueAtTime(0.001, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.12, this.ctx.currentTime + 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch (e) {
+          console.warn("Audio issue:", e);
+        }
+      }
+
+      playPhaseChime(phaseIndex) {
+        if (!this.enabled) return;
+        const freqs = [329.63, 392.00, 493.88, 587.33]; // E4, G4, B4, D5
+        this.playChime(freqs[phaseIndex] || 440, 0.6);
+      }
+    }
+
+    const soundEngine = new AmbientSoundEngine();
+  </script>
+
+  <!-- ==========================================
+       GSAP SCROLLTRIGGER SCROLLYTELLING LOGIC
+  =========================================== -->
+  <script>
+    // Register GSAP plugins
+    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+    // Metadata for the 4 Phases
+    const phasesData = [
+      {
+        index: 0,
+        epoch: "Phase 01 // 800 BCE – 476 CE",
+        name: "古典希臘與羅馬",
+        colorClass: "text-amber-400",
+        glowColor: "rgba(245, 158, 11, 0.16)",
+        targetProgress: 0.138
+      },
+      {
+        index: 1,
+        epoch: "Phase 02 // 14th – 17th Century",
+        name: "義大利文藝復興",
+        colorClass: "text-rose-400",
+        glowColor: "rgba(244, 63, 94, 0.16)",
+        targetProgress: 0.398
+      },
+      {
+        index: 2,
+        epoch: "Phase 03 // Late 19th Century",
+        name: "印象派光影革命",
+        colorClass: "text-cyan-400",
+        glowColor: "rgba(6, 182, 212, 0.16)",
+        targetProgress: 0.657
+      },
+      {
+        index: 3,
+        epoch: "Phase 04 // 20th Century – Present",
+        name: "現代主義與前衛",
+        colorClass: "text-purple-400",
+        glowColor: "rgba(139, 92, 246, 0.16)",
+        targetProgress: 0.906
+      }
+    ];
+
+    let currentPhaseIndex = 0;
+    let mainScrollTrigger = null;
+
+    window.addEventListener("DOMContentLoaded", () => {
+      // 1. Setup SVG Curved Path Geometry with path.getTotalLength()
+      const activeTrack = document.getElementById("active-track");
+      const cometGroup = document.getElementById("comet-group");
+      const railLengthLabel = document.getElementById("rail-length-label");
+
+      const totalLength = activeTrack.getTotalLength();
+      railLengthLabel.textContent = `PATH LENGTH: ${Math.round(totalLength)} PX`;
+
+      // Set initial SVG stroke dashoffset to totalLength (completely undrawn)
+      activeTrack.style.strokeDasharray = `${totalLength} ${totalLength}`;
+      activeTrack.style.strokeDashoffset = totalLength;
+
+      // Position Comet at initial coordinate
+      const startPt = activeTrack.getPointAtLength(0);
+      cometGroup.setAttribute("transform", `translate(${startPt.x}, ${startPt.y})`);
+
+      // 2. Select DOM Elements
+      const topProgressFill = document.getElementById("top-progress-fill");
+      const currentEpochLabel = document.getElementById("current-epoch-label");
+      const progressPercentageLabel = document.getElementById("progress-percentage-label");
+      const scrubRatioText = document.getElementById("scrub-ratio-text");
+      const scrollPixelsIndicator = document.getElementById("scroll-pixels-indicator");
+      const ambientStageGlow = document.getElementById("ambient-stage-glow");
+
+      const phaseCards = [
+        document.getElementById("phase-card-0"),
+        document.getElementById("phase-card-1"),
+        document.getElementById("phase-card-2"),
+        document.getElementById("phase-card-3")
+      ];
+
+      const hudButtons = document.querySelectorAll(".hud-nav-btn");
+      const svgNodes = document.querySelectorAll(".svg-milestone-node");
+
+      // 3. Setup GSAP Pinned Scrollytelling Timeline
+      // Total pinned scroll distance: 3400px with scrub: 1.0 (smooth physics damping)
+      const pinDistance = 3400;
+
+      const scrollyTimeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: "#pinned-track-section",
+          pin: true,
+          start: "top top",
+          end: `+=${pinDistance}`,
+          scrub: 1.0, // Strict requirement: scrub: 1.0 smooth damping
+          anticipatePin: 1,
+          onUpdate: (self) => {
+            handleScrollProgress(self.progress, totalLength);
+          }
+        }
+      });
+
+      mainScrollTrigger = scrollyTimeline.scrollTrigger;
+
+      // 4. Update function executed during scroll scrub
+      function handleScrollProgress(progress, totalLen) {
+        // A. Dynamic Path Drawing
+        const drawOffset = totalLen * (1 - progress);
+        activeTrack.style.strokeDashoffset = drawOffset;
+
+        // B. Dynamic Comet Positioning along the curve tip
+        const currentLengthOnTrack = totalLen * progress;
+        const currentPt = activeTrack.getPointAtLength(Math.min(currentLengthOnTrack, totalLen));
+        cometGroup.setAttribute("transform", `translate(${currentPt.x}, ${currentPt.y})`);
+
+        // C. Top Progress Bar
+        const percentVal = Math.round(progress * 100);
+        topProgressFill.style.width = `${percentVal}%`;
+        progressPercentageLabel.textContent = `${String(percentVal).padStart(2, '0')}% EXPLORED`;
+        scrubRatioText.textContent = progress.toFixed(3);
+
+        if (mainScrollTrigger) {
+          scrollPixelsIndicator.textContent = `SCROLL OFFSET: ${Math.round(window.scrollY)} PX`;
+        }
+
+        // D. Determine Active Phase across the 4 stages
+        let targetIndex = 0;
+        if (progress < 0.26) {
+          targetIndex = 0;
+        } else if (progress < 0.52) {
+          targetIndex = 1;
+        } else if (progress < 0.78) {
+          targetIndex = 2;
+        } else {
+          targetIndex = 3;
+        }
+
+        if (targetIndex !== currentPhaseIndex) {
+          switchPhase(targetIndex);
+        }
+      }
+
+      // 5. Function to switch active Phase Cards & UI Elements
+      function switchPhase(newIndex) {
+        if (newIndex === currentPhaseIndex && phaseCards[newIndex].style.opacity === "1") return;
+
+        const oldIndex = currentPhaseIndex;
+        currentPhaseIndex = newIndex;
+
+        // Play subtle Web Audio chime
+        soundEngine.playPhaseChime(newIndex);
+
+        // Update Epoch text in Header
+        const curData = phasesData[newIndex];
+        currentEpochLabel.textContent = `${curData.epoch.split('//')[0]} // ${curData.name}`;
+        currentEpochLabel.className = `text-xs font-mono font-semibold transition-colors duration-300 ${curData.colorClass}`;
+
+        // Update Ambient Glow Background
+        ambientStageGlow.style.backgroundColor = curData.glowColor;
+
+        // Card Crossfade Animation
+        phaseCards.forEach((card, idx) => {
+          if (idx === newIndex) {
+            gsap.to(card, {
+              opacity: 1,
+              scale: 1,
+              y: 0,
+              duration: 0.55,
+              ease: "power2.out",
+              onStart: () => {
+                card.style.pointerEvents = "auto";
+                card.style.zIndex = "10";
+              }
+            });
+          } else if (idx === oldIndex) {
+            gsap.to(card, {
+              opacity: 0,
+              scale: 0.94,
+              y: idx < newIndex ? -20 : 20,
+              duration: 0.45,
+              ease: "power2.in",
+              onComplete: () => {
+                card.style.pointerEvents = "none";
+                card.style.zIndex = "0";
+              }
+            });
+          } else {
+            gsap.set(card, { opacity: 0, scale: 0.92, y: 30, pointerEvents: "none", zIndex: 0 });
+          }
+        });
+
+        // Update HUD Buttons Active State
+        hudButtons.forEach((btn, idx) => {
+          if (idx === newIndex) {
+            btn.className = `hud-nav-btn active flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 ${idx === 0 ? 'text-amber-300 bg-amber-500/15 border-amber-500/40' :
+                idx === 1 ? 'text-rose-300 bg-rose-500/15 border-rose-500/40' :
+                  idx === 2 ? 'text-cyan-300 bg-cyan-500/15 border-cyan-500/40' :
+                    'text-purple-300 bg-purple-500/15 border-purple-500/40'
+              } border shadow-lg`;
+            const dot = btn.querySelector("span:first-child");
+            if (dot) {
+              dot.className = `w-2 h-2 rounded-full ${idx === 0 ? 'bg-amber-400' :
+                  idx === 1 ? 'bg-rose-400' :
+                    idx === 2 ? 'bg-cyan-400' :
+                      'bg-purple-400'
+                }`;
+            }
+          } else {
+            btn.className = "hud-nav-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 text-slate-400 hover:text-white border border-transparent";
+            const dot = btn.querySelector("span:first-child");
+            if (dot) dot.className = "w-2 h-2 rounded-full bg-slate-600";
+          }
+        });
+
+        // Update SVG Milestone Nodes Highlighting
+        svgNodes.forEach((node, idx) => {
+          const coreCircle = node.querySelector(".node-core");
+          const baseCircle = node.querySelector(".node-base");
+          if (idx === newIndex) {
+            gsap.to(node, { scale: 1.25, transformOrigin: "center center", duration: 0.4, ease: "back.out(2)" });
+            if (coreCircle) coreCircle.setAttribute("r", "8");
+            if (baseCircle) baseCircle.setAttribute("stroke-width", "4");
+          } else {
+            gsap.to(node, { scale: 1.0, transformOrigin: "center center", duration: 0.3 });
+            if (coreCircle) coreCircle.setAttribute("r", "6");
+            if (baseCircle) baseCircle.setAttribute("stroke-width", "2.5");
+          }
+        });
+      }
+
+      // 6. Two-way Navigation: Smooth scroll to phase target height
+      function navigateToPhase(phaseIdx) {
+        if (!mainScrollTrigger) return;
+
+        const targetProgress = phasesData[phaseIdx].targetProgress;
+        const startY = mainScrollTrigger.start;
+        const totalDistance = mainScrollTrigger.end - mainScrollTrigger.start;
+        const targetScrollY = startY + totalDistance * targetProgress;
+
+        soundEngine.playChime(440 + phaseIdx * 110, 0.25);
+
+        gsap.to(window, {
+          duration: 1.2,
+          scrollTo: targetScrollY,
+          ease: "power2.inOut"
+        });
+      }
+
+      // Hook click events on HUD buttons
+      hudButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const idx = parseInt(btn.getAttribute("data-phase-index"), 10);
+          navigateToPhase(idx);
+        });
+      });
+
+      // Hook click and hover events on SVG milestone nodes
+      svgNodes.forEach((node) => {
+        const idx = parseInt(node.getAttribute("data-phase-index"), 10);
+
+        node.addEventListener("click", () => {
+          navigateToPhase(idx);
+        });
+
+        node.addEventListener("mouseenter", () => {
+          document.getElementById("node-hover-hint").textContent = `跳轉至 ${phasesData[idx].name}`;
+          gsap.to(node, { scale: 1.35, transformOrigin: "center center", duration: 0.25 });
+          soundEngine.playChime(880, 0.1);
+        });
+
+        node.addEventListener("mouseleave", () => {
+          document.getElementById("node-hover-hint").textContent = "Hover 節點放大檢視";
+          if (idx !== currentPhaseIndex) {
+            gsap.to(node, { scale: 1.0, transformOrigin: "center center", duration: 0.25 });
+          } else {
+            gsap.to(node, { scale: 1.25, transformOrigin: "center center", duration: 0.25 });
+          }
+        });
+      });
+
+      // 7. Hero & Epilogue Action Buttons
+      const heroStartBtn = document.getElementById("hero-start-btn");
+      if (heroStartBtn) {
+        heroStartBtn.addEventListener("click", () => {
+          navigateToPhase(0);
+        });
+      }
+
+      const replayVoyageBtn = document.getElementById("replay-voyage-btn");
+      if (replayVoyageBtn) {
+        replayVoyageBtn.addEventListener("click", () => {
+          gsap.to(window, {
+            duration: 1.5,
+            scrollTo: 0,
+            ease: "power3.inOut"
+          });
+        });
+      }
+
+      const revisitTimelineBtn = document.getElementById("revisit-timeline-btn");
+      if (revisitTimelineBtn) {
+        revisitTimelineBtn.addEventListener("click", () => {
+          navigateToPhase(0);
+        });
+      }
+
+      const heroQuickGuideBtn = document.getElementById("hero-quick-guide-btn");
+      if (heroQuickGuideBtn) {
+        heroQuickGuideBtn.addEventListener("click", () => {
+          gsap.to(window, {
+            duration: 1.2,
+            scrollTo: "#stats-section",
+            ease: "power2.inOut"
+          });
+        });
+      }
+
+      // 8. Sound Toggle Button
+      const soundToggleBtn = document.getElementById("sound-toggle-btn");
+      const soundIconOn = document.getElementById("sound-icon-on");
+      const soundIconOff = document.getElementById("sound-icon-off");
+      const soundStatusText = document.getElementById("sound-status-text");
+
+      soundToggleBtn.addEventListener("click", () => {
+        const isEnabled = soundEngine.toggle();
+        if (isEnabled) {
+          soundIconOn.classList.remove("hidden");
+          soundIconOff.classList.add("hidden");
+          soundStatusText.textContent = "AUDIO ON";
+          soundStatusText.className = "font-mono text-[11px] text-cyan-300 font-bold";
+        } else {
+          soundIconOn.classList.add("hidden");
+          soundIconOff.classList.remove("hidden");
+          soundStatusText.textContent = "AUDIO OFF";
+          soundStatusText.className = "font-mono text-[11px] text-slate-400";
+        }
+      });
+
+      // 9. Interactive Micro-features inside Phase Cards
+      // Phase 01: Toggle Golden Spiral Grid
+      const toggleGoldenGridBtn = document.getElementById("toggle-golden-grid");
+      const goldenGuides = document.getElementById("golden-guides");
+      if (toggleGoldenGridBtn && goldenGuides) {
+        let gridVisible = true;
+        toggleGoldenGridBtn.addEventListener("click", () => {
+          gridVisible = !gridVisible;
+          goldenGuides.setAttribute("opacity", gridVisible ? "0.8" : "0.0");
+          toggleGoldenGridBtn.textContent = gridVisible ? "隱藏幾何輔助線" : "顯示幾何輔助線";
+          soundEngine.playChime(600, 0.15);
+        });
+      }
+
+      // Phase 02: Interactive Perspective Vanishing Point
+      const perspBox = document.getElementById("perspective-interactive-box");
+      const vanishingOrb = document.getElementById("vanishing-orb");
+      if (perspBox && vanishingOrb) {
+        perspBox.addEventListener("mousemove", (e) => {
+          const rect = perspBox.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const svgX = (x / rect.width) * 500;
+          const svgY = (y / rect.height) * 200;
+          vanishingOrb.setAttribute("cx", Math.max(100, Math.min(400, svgX)));
+          vanishingOrb.setAttribute("cy", Math.max(50, Math.min(150, svgY)));
+        });
+        perspBox.addEventListener("mouseleave", () => {
+          vanishingOrb.setAttribute("cx", "250");
+          vanishingOrb.setAttribute("cy", "100");
+        });
+      }
+
+      // Phase 03: Monet Water Lilies Light Shift Buttons
+      const timeShiftBtns = document.querySelectorAll(".time-shift-btn");
+      const impressionStrokes = document.getElementById("impression-strokes");
+      const monetCanvas = document.getElementById("monet-water-canvas");
+
+      timeShiftBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          timeShiftBtns.forEach(b => {
+            b.className = "time-shift-btn px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400 hover:text-white";
+          });
+          btn.className = "time-shift-btn px-2 py-0.5 rounded text-[10px] bg-cyan-500/30 text-cyan-200 border border-cyan-400/40";
+
+          const time = btn.getAttribute("data-time");
+          soundEngine.playChime(750, 0.2);
+
+          if (time === "morning") {
+            monetCanvas.className = "relative w-full h-28 sm:h-32 bg-gradient-to-r from-cyan-950 via-slate-900 to-teal-950 rounded-xl overflow-hidden border border-white/5 flex items-center justify-center transition-all duration-700";
+            impressionStrokes.setAttribute("filter", "none");
+          } else if (time === "noon") {
+            monetCanvas.className = "relative w-full h-28 sm:h-32 bg-gradient-to-r from-sky-900 via-blue-900 to-amber-950/60 rounded-xl overflow-hidden border border-white/5 flex items-center justify-center transition-all duration-700";
+            impressionStrokes.setAttribute("filter", "url(#node-glow)");
+          } else if (time === "sunset") {
+            monetCanvas.className = "relative w-full h-28 sm:h-32 bg-gradient-to-r from-amber-950 via-rose-950 to-purple-950 rounded-xl overflow-hidden border border-white/5 flex items-center justify-center transition-all duration-700";
+            impressionStrokes.setAttribute("filter", "none");
+          }
+        });
+      });
+
+      // Phase 04: Modernism Deconstruct Form Button
+      const deconstructArtBtn = document.getElementById("deconstruct-art-btn");
+      const cubistFacet = document.getElementById("cubist-facet");
+      const cubePlane1 = document.getElementById("cube-plane-1");
+      const cubePlane2 = document.getElementById("cube-plane-2");
+      let isDeconstructed = false;
+
+      if (deconstructArtBtn && cubistFacet) {
+        deconstructArtBtn.addEventListener("click", () => {
+          isDeconstructed = !isDeconstructed;
+          soundEngine.playChime(320, 0.3, 'triangle');
+
+          if (isDeconstructed) {
+            cubistFacet.setAttribute("transform", "translate(40, -15) rotate(18, 350, 80) scale(1.15)");
+            cubePlane1.setAttribute("transform", "translate(-20, 15) rotate(-12, 110, 70)");
+            cubePlane2.setAttribute("transform", "translate(25, -10) rotate(8, 240, 55)");
+            deconstructArtBtn.textContent = "復原幾何結構";
+          } else {
+            cubistFacet.setAttribute("transform", "translate(0, 0) rotate(0)");
+            cubePlane1.setAttribute("transform", "translate(0, 0) rotate(0)");
+            cubePlane2.setAttribute("transform", "translate(0, 0) rotate(0)");
+            deconstructArtBtn.textContent = "點擊解構形體";
+          }
+        });
+      }
+
+      // Keyboard navigation support (Arrow keys: Left/Right or 1..4 keys)
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+          if (currentPhaseIndex < 3) navigateToPhase(currentPhaseIndex + 1);
+        } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+          if (currentPhaseIndex > 0) navigateToPhase(currentPhaseIndex - 1);
+        } else if (['1', '2', '3', '4'].includes(e.key)) {
+          navigateToPhase(parseInt(e.key, 10) - 1);
+        }
+      });
+
+      // Ensure ScrollTrigger accurately measures positions after fonts load
+      setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 300);
+    });
+  </script>
+</body>
+
+</html>
